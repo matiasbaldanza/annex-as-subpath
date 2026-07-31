@@ -7,11 +7,13 @@
  * tempted to break it.
  */
 
+import { writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 
 import { loadConfigFile, resolveConfig, UsageError } from "./config.js";
 import { gather, hasFailures, runChecks } from "./doctor.js";
 import { format, supportsColor } from "./report.js";
+import { renderRunbook } from "./runbook.js";
 
 const HELP = `annex-as-subpath — serve a separate Next.js app on a path of an existing site
 
@@ -19,8 +21,26 @@ USAGE
   annex <command> [options]
 
 COMMANDS
+  steps <url>     Print the human runbook for this project, values filled in.
   doctor <url>    Verify a live deployment. Exits non-zero on failure.
   help            This.
+
+STEPS
+  annex steps https://example.dev/thing [options]
+
+  The dashboard and DNS steps, in dependency order, with a verification after
+  each one and what it looks like when it goes wrong. Every value is already
+  substituted — the only thing you copy off a screen is the CNAME target,
+  which is account-specific and says so.
+
+  --subdomain <host>      Rewrite target. Default: thing-app.example.dev
+  --child-project <name>  Vercel project name for the app. Default: thing
+  --apex-project <name>   Vercel project name for the parent site.
+  --label <text>          Way-back link text, completing the sentence
+                          "I believe you came here through ___".
+  --no-way-back           Omit the way-back section.
+  --unlisted / --indexed  Whether the page stays out of search results.
+  --out <path>            Write to a file instead of stdout.
 
 DOCTOR
   annex doctor https://example.dev/thing [options]
@@ -61,6 +81,11 @@ const OPTIONS = {
   timeout: { type: "string" },
   json: { type: "boolean" },
   help: { type: "boolean", short: "h" },
+  "child-project": { type: "string" },
+  "apex-project": { type: "string" },
+  label: { type: "string" },
+  "no-way-back": { type: "boolean" },
+  out: { type: "string" },
 };
 
 export async function main(argv = process.argv.slice(2), io = console) {
@@ -80,7 +105,7 @@ export async function main(argv = process.argv.slice(2), io = console) {
     return command && command !== "help" ? 2 : 0;
   }
 
-  if (command !== "doctor") {
+  if (command !== "doctor" && command !== "steps") {
     io.error(`Unknown command: ${command}\n\nRun \`annex help\` for usage.`);
     return 2;
   }
@@ -94,6 +119,22 @@ export async function main(argv = process.argv.slice(2), io = console) {
       return 2;
     }
     throw error;
+  }
+
+  if (command === "steps") {
+    // The runbook is instructions for creating the subdomain, so an unset one
+    // takes the proposed name rather than becoming a blocking question.
+    const markdown = renderRunbook({
+      ...config,
+      subdomain: config.subdomain ?? config.suggestedSubdomain,
+    });
+    if (flags.out) {
+      writeFileSync(flags.out, markdown);
+      io.error(`Wrote ${flags.out}`);
+    } else {
+      io.log(markdown);
+    }
+    return 0;
   }
 
   const bundle = await gather(config);

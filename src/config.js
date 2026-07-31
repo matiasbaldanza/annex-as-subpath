@@ -102,13 +102,33 @@ export function resolveConfig({ url, flags = {}, file = null } = {}) {
   else if (flags.indexed) unlisted = false;
   else if (typeof file?.unlisted === "boolean") unlisted = file.unlisted;
 
+  // A name to propose when none was given. The runbook needs one — it is
+  // telling you to create the record — while the doctor must never assume one,
+  // because checking a hostname nobody configured would report a real-looking
+  // failure for a thing that was never meant to exist.
+  const apexHost = new URL(origin).host;
+  const pathSlug = basePath.replace(/^\/+/, "").replace(/\//g, "-");
+  const suggestedSubdomain = `${pathSlug}-app.${apexHost}`;
+
   return {
     origin,
     basePath,
     publicUrl,
     subdomain,
+    suggestedSubdomain,
     childOrigin: subdomain ? `https://${subdomain}` : null,
     unlisted,
     timeout: Number(flags.timeout ?? 10_000),
+
+    // Runbook-only. Vercel project names cannot be derived from a URL, so
+    // these are proposals the reader corrects in context — seeing
+    // "Vercel → thing → Settings" with the wrong name is self-evident in a way
+    // that "Vercel → <your project>" is not.
+    childProject: flags["child-project"] ?? file?.childProject ?? pathSlug,
+    apexProject: flags["apex-project"] ?? file?.apexProject ?? apexHost,
+    wayBack: {
+      enabled: flags["no-way-back"] ? false : (file?.wayBack?.enabled ?? true),
+      label: flags.label ?? file?.wayBack?.label ?? `my ${pathSlug} page`,
+    },
   };
 }
