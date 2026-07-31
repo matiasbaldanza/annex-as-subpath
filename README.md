@@ -15,8 +15,8 @@ stability guarantees: the command surface, the check ids, and the output format
 can all change without ceremony. It is published to npm so `pnpm dlx` works,
 not as a promise of support.
 
-Currently implemented: `doctor` and `help`. The scaffolding commands (`init`,
-`apex`, `steps`) and the generated runbook are next.
+Currently implemented: `steps`, `doctor`, and `help`. The scaffolding commands
+(`init`, `apex`) are next.
 
 If it is useful to you, take it. If it breaks something, that is the deal above.
 
@@ -127,6 +127,30 @@ the child's own host it writes to an origin the parent cannot read — expected,
 and the first thing to check when the banner seems broken.
 
 ## Commands
+
+```bash
+pnpm dlx annex-as-subpath steps https://example.dev/thing
+```
+
+Prints the runbook for *your* project: the dashboard and DNS steps in
+dependency order, with every value substituted, a verification command after
+each step with its expected output, and what the step looks like when it goes
+wrong. `--out docs/runbook.md` writes it to a file.
+
+The order is the point. Deployment Protection comes off before anything is
+verified, and the child is verified standalone before the apex is touched —
+otherwise the first symptom you see points at the wrong system. The only value
+you copy off a screen is the CNAME target, which is account-specific and says
+so where it matters.
+
+```
+--subdomain <host>      Rewrite target. Default: thing-app.example.dev
+--child-project <name>  Vercel project name for the app.
+--apex-project <name>   Vercel project name for the parent site.
+--label <text>          Way-back link text.
+--no-way-back           Omit the way-back section.
+--out <path>            Write to a file instead of stdout.
+```
 
 ```bash
 pnpm dlx annex-as-subpath doctor https://example.dev/thing

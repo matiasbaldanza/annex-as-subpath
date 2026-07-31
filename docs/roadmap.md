@@ -17,34 +17,32 @@ Ordering is by dependency, not by appeal.
 - **Config** — public URL parsing, flags, and `annex.json`, flags winning.
 - **Tests** — 54, no network, fixtures captured from the live deployment rather
   than hand-written. ADR-0003.
+- **`steps`** — the runbook generator. Ten dependency-ordered steps with exact
+  navigation paths, a DNS field-value table, a verification command after each
+  with its expected output, and the failure symptom inline. Every value
+  substituted; the CNAME target is the only thing read off a screen, and says
+  so. Tests assert no placeholder and no reference-project value survives into
+  the output.
 - **Docs** — README, `AGENTS.md`, ADRs 0001–0003, MIT `LICENSE`.
 - npm name `annex-as-subpath` confirmed available. Not yet published.
 
 ## Next
 
-1. **`steps` and the runbook generator.** Deliverable 0 and the thing to get
-   right if only one thing is: numbered, dependency-ordered instructions with
-   exact navigation paths, a field-value table, a copy-pasteable verification
-   after each step, and what the step looks like when it goes wrong. Real
-   domain and path substituted, never a template to translate.
-
-   Blocks item 5 — you cannot follow instructions that have not been generated.
-
-2. **`init`.** Emits into the child app: `base-path.ts` with the `assetPath`
+1. **`init`.** Emits into the child app: `base-path.ts` with the `assetPath`
    helper, the way-back marker, the runbook. New files only; paste-ready
    patches for `next.config.ts` and the layout. ADR-0001.
 
-3. **`apex`.** Emits into the parent repo: the two rewrite rules, and the
+2. **`apex`.** Emits into the parent repo: the two rewrite rules, and the
    optional vanilla way-back banner — hidden by default, `try/catch` around
    the read, `label` via `textContent`, `href` validated as parent-relative.
 
-4. **A local fake apex, for `probe.js`.** A small `node:http` server emitting
+3. **A local fake apex, for `probe.js`.** A small `node:http` server emitting
    the pathologies on demand — `cf-ray` headers, a 301 loop, an absolute
    `Location`, a body with root-level `/_next/`. Currently the probe layer is
    the one part with no test but the single live run that happened to hit a
    mostly-healthy site.
 
-5. **End-to-end against a throwaway app.** A fresh `create-next-app`, its own
+4. **End-to-end against a throwaway app.** A fresh `create-next-app`, its own
    Vercel project and subdomain, a second path on the same zone. Break one
    dashboard thing at a time — protection on, cloud orange — and confirm the
    doctor names the right cause. The only way to test the dashboard-side
@@ -55,7 +53,7 @@ Ordering is by dependency, not by appeal.
    comments already contain the answers, and DNS and dashboard state do not
    revert with git.
 
-6. **Publish.** After 5, not before.
+5. **Publish.** After 4, not before.
 
 ## Decided, not yet built
 
