@@ -12,13 +12,48 @@ those eight are checked rather than rediscovered.
 
 Work in progress, built for my own use, evolving as I need more from it. No
 stability guarantees: the command surface, the check ids, and the output format
-can all change without ceremony. It is published to npm so `pnpm dlx` works,
-not as a promise of support.
+can all change without ceremony. Publication to npm is so that `pnpm dlx`
+works, not a promise of support.
 
 Currently implemented: `steps`, `doctor`, and `help`. The scaffolding commands
 (`init`, `apex`) are next.
 
 If it is useful to you, take it. If it breaks something, that is the deal above.
+
+## Run it
+
+Three ways, in order of least commitment.
+
+**From the repo, nothing installed.** Works today, no npm account involved:
+
+```bash
+pnpm dlx github:matiasbaldanza/annex-as-subpath steps https://example.dev/thing
+```
+
+**From the npm registry**, once published:
+
+```bash
+pnpm dlx annex-as-subpath doctor https://example.dev/thing
+```
+
+**Cloned, running the script directly.** No install step — it is plain ESM with
+zero dependencies, so Node runs it as-is:
+
+```bash
+git clone https://github.com/matiasbaldanza/annex-as-subpath
+node annex-as-subpath/src/cli.js help
+```
+
+To get `annex` on your PATH from that clone:
+
+```bash
+cd annex-as-subpath && pnpm link --global
+```
+
+Undo with `pnpm uninstall --global annex-as-subpath`.
+
+Start with `steps` if you are setting this up, `doctor` if you already have.
+Then read the rest of this page to understand what it is checking and why.
 
 ## Where this came from
 

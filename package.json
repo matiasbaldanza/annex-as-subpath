@@ -10,6 +10,13 @@
     "rewrites"
   ],
   "license": "MIT",
+  "author": "Matias Baldanza",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matiasbaldanza/annex-as-subpath.git"
+  },
+  "homepage": "https://github.com/matiasbaldanza/annex-as-subpath#readme",
+  "bugs": "https://github.com/matiasbaldanza/annex-as-subpath/issues",
   "type": "module",
   "bin": {
     "annex": "./src/cli.js",
@@ -25,6 +32,7 @@
   ],
   "scripts": {
     "test": "node --test",
-    "doctor": "node ./src/cli.js doctor"
+    "doctor": "node ./src/cli.js doctor",
+    "prepublishOnly": "node --test"
   }
 }
