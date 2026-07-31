@@ -1,0 +1,30 @@
+{
+  "name": "annex-as-subpath",
+  "version": "0.1.0",
+  "description": "Serve a separate Next.js app on a path of an existing site: scaffolding, a human runbook, and a doctor that verifies the live deployment.",
+  "keywords": [
+    "nextjs",
+    "vercel",
+    "basepath",
+    "multi-zones",
+    "rewrites"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "annex": "./src/cli.js",
+    "annex-as-subpath": "./src/cli.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "files": [
+    "src",
+    "templates",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "doctor": "node ./src/cli.js doctor"
+  }
+}

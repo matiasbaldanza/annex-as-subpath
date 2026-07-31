@@ -1,0 +1,6 @@
+# pnpm 11 ignores the "pnpm" field in package.json — its settings live here.
+#
+# Zero runtime dependencies is a hard rule (see AGENTS.md), so nothing is
+# allowed to run an install script. An empty allow-list makes a dependency that
+# wants one fail loudly at install time rather than quietly at runtime.
+onlyBuiltDependencies: []
